@@ -16,11 +16,13 @@ class ContactForm extends HTMLElement {
 
   connectedCallback() {
     // Render the initial structure immediately
-    this.render();
+    this.render(); // This applies initial styles with current fontFamily (might be fallback)
 
     // Load Google Font and then update styles
     this.loadGoogleFont().then(() => {
-      this.updateStyles(); // <--- Add this
+      // After Google Font is loaded and googleFontLoaded is true,
+      // call updateStyles to re-render CSS with the new font.
+      this.updateStyles();
     });
 
     this.loadCleavejs().then(() => {
@@ -49,7 +51,7 @@ class ContactForm extends HTMLElement {
       // When google-font changes, reset the loaded flag and re-load/update
       this.googleFontLoaded = false; // Important: Reset the flag
       this.loadGoogleFont().then(() => {
-        this.updateStyles();
+        this.updateStyles(); // Re-apply styles after the new font loads
       });
     } else {
       // Re-render styles for other attribute changes
@@ -61,22 +63,19 @@ class ContactForm extends HTMLElement {
     return new Promise((resolve) => {
       const googleFont = this.getAttribute('google-font');
 
-      if (!googleFont) { // If no google-font attribute, resolve immediately
-        this.googleFontLoaded = false; // Ensure flag is false if no font is specified
+      if (!googleFont) {
+        this.googleFontLoaded = false;
         resolve();
         return;
       }
 
-      // Check if font is already loaded or being loaded
       const existingLink = document.head.querySelector(`link[href*="fonts.googleapis.com"][href*="${googleFont.replace(/\s+/g, '+')}"]`);
       if (existingLink) {
-        // If the font is already in the head, assume it's loaded or will be
         this.googleFontLoaded = true;
         resolve();
         return;
       }
 
-      // Create and load Google Font
       const link = document.createElement('link');
       link.rel = 'stylesheet';
       link.href = `https://fonts.googleapis.com/css2?family=${googleFont.replace(/\s+/g, '+')}:wght@400;500;600&display=swap`;
@@ -88,7 +87,7 @@ class ContactForm extends HTMLElement {
 
       link.onerror = () => {
         console.warn(`Failed to load Google Font: ${googleFont}`);
-        this.googleFontLoaded = false; // Font failed to load
+        this.googleFontLoaded = false;
         resolve();
       };
 
@@ -97,7 +96,6 @@ class ContactForm extends HTMLElement {
   }
 
   setupThemeWatchers() {
-    // Watch for system theme changes
     this.themeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     this.handleSystemThemeChange = () => {
       if (!this.getAttribute('theme')) {
@@ -106,7 +104,6 @@ class ContactForm extends HTMLElement {
     };
     this.themeMediaQuery.addEventListener('change', this.handleSystemThemeChange);
 
-    // Watch for common theme attribute changes on html/body
     this.themeObserver = new MutationObserver(() => {
       if (!this.getAttribute('theme')) {
         this.updateTheme();
@@ -133,10 +130,8 @@ class ContactForm extends HTMLElement {
     let isDark = false;
 
     if (explicitTheme) {
-      // Explicit theme attribute takes priority
       isDark = explicitTheme === "dark";
     } else {
-      // Auto-detect theme from various sources
       isDark = this.detectDarkMode();
     }
 
@@ -148,21 +143,17 @@ class ContactForm extends HTMLElement {
   }
 
   detectDarkMode() {
-    // Check common theme indicators
     const html = document.documentElement;
     const body = document.body;
 
-    // Check data-theme attribute
     const dataTheme = html.getAttribute('data-theme') || body.getAttribute('data-theme');
     if (dataTheme === 'dark') return true;
     if (dataTheme === 'light') return false;
 
-    // Check common class names
     if (html.classList.contains('dark') || body.classList.contains('dark')) return true;
     if (html.classList.contains('dark-mode') || body.classList.contains('dark-mode')) return true;
     if (html.classList.contains('theme-dark') || body.classList.contains('theme-dark')) return true;
 
-    // Fall back to system preference
     return window.matchMedia("(prefers-color-scheme: dark)").matches;
   }
 
@@ -170,7 +161,6 @@ class ContactForm extends HTMLElement {
     const googleFont = this.getAttribute('google-font');
     const customFontFamily = this.getAttribute('font-family');
 
-    // Only apply googleFont if it's specified and confirmed loaded
     if (googleFont && this.googleFontLoaded) {
       return `"${googleFont}", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
     } else if (customFontFamily) {
@@ -363,7 +353,6 @@ class ContactForm extends HTMLElement {
   }
 
   render() {
-    // We create the style tag only once, then update its content
     if (!this.shadowRoot.querySelector('style')) {
       const styleTag = document.createElement('style');
       this.shadowRoot.appendChild(styleTag);
@@ -389,8 +378,7 @@ class ContactForm extends HTMLElement {
         </div>
         <div class="form-group">
           <label for="phone">Phone</label>
-          <input type="tel" id="phone" name="phone" required>
-        </div>
+          <input type="tel" id="phone" name="phone"> </div>
         <div class="form-group">
           <label for="message">Message</label>
           <textarea id="message" name="message" required></textarea>
@@ -398,14 +386,13 @@ class ContactForm extends HTMLElement {
         <button type="submit" class="submit-btn">Send Message</button>
       </form>
     `;
-    this.updateStyles(); // Ensure styles are applied after initial render
+    this.updateStyles();
   }
 
   setupEventListeners() {
     const form = this.shadowRoot.querySelector('form');
     const submitBtn = this.shadowRoot.querySelector('.submit-btn');
 
-    // Initialize validation
     this.initializeValidation();
 
     submitBtn.addEventListener('click', (e) => {
@@ -443,6 +430,7 @@ class ContactForm extends HTMLElement {
 
   initializeValidation() {
     const form = this.shadowRoot.querySelector('form');
+    // Only select required inputs for initial validation
     const inputs = form.querySelectorAll('input, textarea');
 
     inputs.forEach(input => {
@@ -460,25 +448,22 @@ class ContactForm extends HTMLElement {
 
     const value = field.value.trim();
 
-    // Check required fields
+    // Check required fields (phone is no longer required here)
     if (field.required && !value) {
       this.showError(field, 'This field is required');
       return false;
     }
 
-    // Name validation (at least 1 character)
     if ((field.name === 'firstName' || field.name === 'lastName') && value && value.length < 1) {
       this.showError(field, 'Name must be at least 1 character');
       return false;
     }
 
-    // Message validation (at least 1 character)
     if (field.name === 'message' && value && value.length < 1) {
       this.showError(field, 'Message must be at least 1 character');
       return false;
     }
 
-    // Email validation
     if (field.type === 'email' && value) {
       if (!this.isValidEmail(value)) {
         this.showError(field, 'Please enter a valid email address');
@@ -486,7 +471,7 @@ class ContactForm extends HTMLElement {
       }
     }
 
-    // Phone validation
+    // Phone validation only if a value is provided
     if (field.type === 'tel' && value) {
       if (!this.isValidPhone(value)) {
         this.showError(field, 'Please enter a valid phone number (xxx-xxx-xxxx)');
@@ -524,19 +509,29 @@ class ContactForm extends HTMLElement {
   }
 
   isValidPhone(phone) {
+    // This regex will now only apply if a phone number IS entered and needs validation
     return /^\d{3}-\d{3}-\d{4}$/.test(phone);
   }
 
   validateForm() {
     const form = this.shadowRoot.querySelector('form');
-    const inputs = form.querySelectorAll('input[required], textarea[required]');
+    // Select only explicitly required inputs for form-wide validation
+    const inputsToValidate = form.querySelectorAll('input[required], textarea[required]');
     let isValid = true;
 
-    inputs.forEach(input => {
+    inputsToValidate.forEach(input => {
       if (!this.validateField(input)) {
         isValid = false;
       }
     });
+
+    // Manually validate phone if a value is present, even though it's not required
+    const phoneInput = form.querySelector('#phone');
+    if (phoneInput && phoneInput.value.trim() !== '') {
+        if (!this.validateField(phoneInput)) {
+            isValid = false;
+        }
+    }
 
     return isValid;
   }
@@ -548,7 +543,6 @@ class ContactForm extends HTMLElement {
       return;
     }
 
-    // Validate form before submitting
     if (!this.validateForm()) {
       this.showMessage('Please fix the errors above', 'error');
       return;
@@ -558,20 +552,17 @@ class ContactForm extends HTMLElement {
     const formData = new FormData(form);
     const submitBtn = this.shadowRoot.querySelector('.submit-btn');
 
-    // Show loading state
     const originalText = submitBtn.textContent;
     submitBtn.textContent = 'Sending...';
     submitBtn.disabled = true;
 
-    // Send data in the format your email system expects
     const data = {
       firstName: formData.get('firstName'),
       lastName: formData.get('lastName'),
       email: formData.get('email'),
-      phone: formData.get('phone'),
+      // Set phone to '000-000-0000' if it's empty
+      phone: formData.get('phone') || '000-000-0000',
       message: formData.get('message'),
-
-      // DevLeads integration fields - auto-generated
       businessName: `${formData.get('firstName')} ${formData.get('lastName')}`,
       businessPhone: '',
       businessPhoneExt: '',
@@ -579,14 +570,10 @@ class ContactForm extends HTMLElement {
       businessServices: '',
       phoneExt: '',
       textNumber: '',
-
-      // DevLeads integration fields - service details
       preferredContact: 'email',
       serviceDesired: 'Web Development',
       hasWebsite: 'no',
       websiteAddress: '',
-
-      // DevLeads integration fields - billing address (required for email template)
       billingStreet: 'N/A',
       billingAptUnit: '',
       billingCity: 'N/A',
@@ -601,8 +588,6 @@ class ContactForm extends HTMLElement {
         zipCode: '00000',
         country: 'USA'
       },
-
-      // DevLeads integration fields - form submission flag
       isFormSubmission: true
     };
 
@@ -619,10 +604,10 @@ class ContactForm extends HTMLElement {
         const successMessage = this.getAttribute('success-message') || 'Message sent successfully!';
         this.showMessage(successMessage, 'success');
         form.reset();
-        // Clear validation states after reset
         const inputs = form.querySelectorAll('input, textarea');
         inputs.forEach(input => {
           input.classList.remove('valid', 'invalid');
+          this.removeError(input); // Also remove any error messages
         });
       } else {
         const errorText = await response.text();
@@ -634,7 +619,6 @@ class ContactForm extends HTMLElement {
       const errorMessage = this.getAttribute('error-message') || 'Failed to send message. Please try again.';
       this.showMessage(errorMessage, 'error');
     } finally {
-      // Reset button state
       submitBtn.textContent = originalText;
       submitBtn.disabled = false;
     }
