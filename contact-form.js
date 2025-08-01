@@ -5,7 +5,7 @@ class ContactForm extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['endpoint', 'email-to', 'primary-color', 'background-color', 'text-color', 'border-radius', 'success-message', 'error-message'];
+    return ['endpoint', 'primary-color', 'background-color', 'text-color', 'border-radius', 'success-message', 'error-message'];
   }
 
   connectedCallback() {

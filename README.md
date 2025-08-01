@@ -121,7 +121,6 @@ Set a custom API endpoint for form submission:
 | Attribute | Description | Default |
 |-----------|-------------|---------|
 | `endpoint` | API endpoint URL for form submission | Required |
-| `email-to` | Target email address (sent with form data) | Optional |
 | `primary-color` | Main button/accent color | `#3b82f6` |
 | `background-color` | Form background color | `#ffffff` |
 | `text-color` | Text color | `#374151` |
