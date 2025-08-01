@@ -135,7 +135,7 @@ class ContactForm extends HTMLElement {
         border-radius: ${borderRadius};
         max-width: 500px;
         margin: 0 auto;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2), 0 8px 24px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
       }
 
       .form-group {
