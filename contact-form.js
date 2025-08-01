@@ -6,9 +6,9 @@ class ContactForm extends HTMLElement {
 
   static get observedAttributes() {
     return [
-      'endpoint', 'primary-color', 'background-color', 'text-color', 'border-color', 
+      'endpoint', 'theme', 'primary-color', 'background-color', 'text-color', 'border-color', 
       'border-radius', 'font-family', 'font-size', 'google-font', 'success-message', 
-      'error-message', 'auto-dark-mode', 'theme', 'dark-primary-color', 'dark-background-color', 
+      'error-message', 'dark-primary-color', 'dark-background-color', 
       'dark-text-color', 'dark-border-color'
     ];
   }
@@ -19,52 +19,42 @@ class ContactForm extends HTMLElement {
       this.initializePhoneFormatting();
     });
     this.setupEventListeners();
-    
-    if (this.getAttribute('auto-dark-mode') === 'true') {
-      this.darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      this.handleDarkModeChange = () => this.render();
-      this.darkModeMediaQuery.addEventListener('change', this.handleDarkModeChange);
+    this.updateTheme();
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (name === "theme") {
+      this.updateTheme();
     }
   }
 
-  disconnectedCallback() {
-    if (this.darkModeMediaQuery && this.handleDarkModeChange) {
-      this.darkModeMediaQuery.removeEventListener('change', this.handleDarkModeChange);
+  updateTheme() {
+    const container = this.shadowRoot.querySelector(".contact-form");
+    if (!container) return;
+
+    const explicitTheme = this.getAttribute("theme");
+    const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+    if (explicitTheme === "dark" || (explicitTheme !== "light" && prefersDarkScheme)) {
+      container.classList.add("dark-mode");
+    } else {
+      container.classList.remove("dark-mode");
     }
   }
 
   get styles() {
-    const explicitTheme = this.getAttribute('theme');
-    const autoDarkMode = this.getAttribute('auto-dark-mode') === 'true';
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    // Determine if we should use dark mode
-    let isDarkMode = false;
-    if (explicitTheme) {
-      // Manual theme override takes priority
-      isDarkMode = explicitTheme === 'dark';
-    } else if (autoDarkMode) {
-      // Fall back to system preference if auto-dark-mode is enabled
-      isDarkMode = systemPrefersDark;
-    }
-
-    let primaryColor, backgroundColor, textColor, borderColor;
-
-    if (isDarkMode) {
-      primaryColor = this.getAttribute('dark-primary-color') || this.getAttribute('primary-color') || '#60a5fa';
-      backgroundColor = this.getAttribute('dark-background-color') || this.getAttribute('background-color') || '#1f2937';
-      textColor = this.getAttribute('dark-text-color') || this.getAttribute('text-color') || '#f9fafb';
-      borderColor = this.getAttribute('dark-border-color') || this.getAttribute('border-color') || '#4b5563';
-    } else {
-      primaryColor = this.getAttribute('primary-color') || '#3b82f6';
-      backgroundColor = this.getAttribute('background-color') || '#ffffff';
-      textColor = this.getAttribute('text-color') || '#374151';
-      borderColor = this.getAttribute('border-color') || '#d1d5db';
-    }
-
+    const primaryColor = this.getAttribute('primary-color') || '#3b82f6';
+    const backgroundColor = this.getAttribute('background-color') || '#ffffff';
+    const textColor = this.getAttribute('text-color') || '#374151';
+    const borderColor = this.getAttribute('border-color') || '#d1d5db';
     const borderRadius = this.getAttribute('border-radius') || '6px';
     const fontFamily = this.getAttribute('font-family') || '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
     const fontSize = this.getAttribute('font-size') || '14px';
+
+    const darkPrimaryColor = this.getAttribute('dark-primary-color') || '#60a5fa';
+    const darkBackgroundColor = this.getAttribute('dark-background-color') || '#1f2937';
+    const darkTextColor = this.getAttribute('dark-text-color') || '#f9fafb';
+    const darkBorderColor = this.getAttribute('dark-border-color') || '#4b5563';
 
     return `
       :host {
@@ -179,6 +169,32 @@ class ContactForm extends HTMLElement {
         font-size: 12px;
         margin-top: 4px;
         font-weight: 500;
+      }
+
+      /* Dark Mode */
+      .contact-form.dark-mode {
+        background: ${darkBackgroundColor};
+        color: ${darkTextColor};
+      }
+
+      .dark-mode label {
+        color: ${darkTextColor};
+      }
+
+      .dark-mode input,
+      .dark-mode textarea {
+        background: ${darkBackgroundColor};
+        color: ${darkTextColor};
+        border-color: ${darkBorderColor};
+      }
+
+      .dark-mode input:focus,
+      .dark-mode textarea:focus {
+        border-color: ${darkPrimaryColor};
+      }
+
+      .dark-mode .submit-btn {
+        background: ${darkPrimaryColor};
       }
     `;
   }
