@@ -2,6 +2,8 @@
 
 A lightweight, customizable web component for collecting contact inquiries. This component provides a clean, professional contact form with built-in validation and modern styling that can be embedded anywhere.
 
+![form](form.png)
+
 ## Features
 
 - **Shadow DOM Encapsulation**: Styles and DOM are isolated from the rest of the page
@@ -17,6 +19,13 @@ A lightweight, customizable web component for collecting contact inquiries. This
 
 ## Installation
 
+#### Via CDN (preferred)
+
+```html
+<script src="https://raw.githack.com/DevManSam777/minimalist-contact-form/main/contact-form.js" defer></script>
+```
+
+#### Alternatively 
 1. Download the contact form component files
 2. Include them in your HTML file:
 
@@ -34,12 +43,6 @@ A lightweight, customizable web component for collecting contact inquiries. This
 
 <!-- JavaScript -->
 <script src="path/to/contact-form.js" defer></script>
-```
-
-#### Alternatively, via CDN
-
-```html
-<script src="https://your-cdn-url/contact-form.js" defer></script>
 ```
 
 ## Basic Usage
