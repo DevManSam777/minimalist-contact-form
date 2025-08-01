@@ -12,8 +12,7 @@ A lightweight, customizable web component for collecting contact inquiries. This
 - **Email Validation**: Proper email format validation
 - **Responsive Design**: Works on all device sizes
 - **Customizable Styling**: Configurable colors, fonts, and themes
-- **Google Fonts Support**: Easy integration with Google Fonts
-- **Dark Mode Support**: Automatic dark mode detection or manual override
+- **Universal Theme Detection**: Automatically detects dark/light mode from system preferences or common website theme patterns (data-theme, dark class, etc.)
 - **Loading States**: Visual feedback during form submission
 - **Error Handling**: Graceful error handling with user-friendly messages
 
@@ -84,6 +83,7 @@ Set a custom API endpoint for form submission:
   border-radius="12px"
 ></contact-form>
 ```
+```
 
 ### Google Fonts
 
@@ -98,21 +98,12 @@ Set a custom API endpoint for form submission:
 ### Dark Mode Support
 
 ```html
-<!-- Automatic dark mode detection -->
+<!-- Automatic dark mode detection (detects system preference and website themes) -->
 <contact-form
   endpoint="https://your-api.com/contact"
-  auto-dark-mode="true"
   dark-primary-color="#60a5fa"
   dark-background-color="#1f2937"
   dark-text-color="#f9fafb"
-></contact-form>
-
-<!-- Manual dark mode -->
-<contact-form
-  endpoint="https://your-api.com/contact"
-  primary-color="#3b82f6"
-  background-color="#1f2937"
-  text-color="#f9fafb"
 ></contact-form>
 ```
 
@@ -131,9 +122,8 @@ Set a custom API endpoint for form submission:
 | `google-font` | Google Font name | None |
 | `success-message` | Custom success message | `Thank you! Your message has been sent.` |
 | `error-message` | Custom error message | `Sorry, there was an error. Please try again.` |
-| `auto-dark-mode` | Enable automatic dark mode detection | `false` |
-| `dark-primary-color` | Primary color for dark mode | Uses `primary-color` |
-| `dark-background-color` | Background color for dark mode | `#374151` |
+| `dark-primary-color` | Primary color for dark mode | `#60a5fa` |
+| `dark-background-color` | Background color for dark mode | `#1f2937` |
 | `dark-text-color` | Text color for dark mode | `#f9fafb` |
 | `dark-border-color` | Border color for dark mode | `#4b5563` |
 
