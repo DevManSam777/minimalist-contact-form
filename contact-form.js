@@ -20,6 +20,16 @@ class ContactForm extends HTMLElement {
     });
     this.setupEventListeners();
     this.updateTheme();
+    this.setupThemeWatchers();
+  }
+
+  disconnectedCallback() {
+    if (this.themeMediaQuery) {
+      this.themeMediaQuery.removeEventListener('change', this.handleSystemThemeChange);
+    }
+    if (this.themeObserver) {
+      this.themeObserver.disconnect();
+    }
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -28,18 +38,74 @@ class ContactForm extends HTMLElement {
     }
   }
 
+  setupThemeWatchers() {
+    // Watch for system theme changes
+    this.themeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    this.handleSystemThemeChange = () => {
+      if (!this.getAttribute('theme')) {
+        this.updateTheme();
+      }
+    };
+    this.themeMediaQuery.addEventListener('change', this.handleSystemThemeChange);
+
+    // Watch for common theme attribute changes on html/body
+    this.themeObserver = new MutationObserver(() => {
+      if (!this.getAttribute('theme')) {
+        this.updateTheme();
+      }
+    });
+
+    this.themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme', 'class']
+    });
+
+    this.themeObserver.observe(document.body, {
+      attributes: true,
+      attributeFilter: ['data-theme', 'class']
+    });
+  }
+
   updateTheme() {
     const container = this.shadowRoot.querySelector(".contact-form");
     if (!container) return;
 
     const explicitTheme = this.getAttribute("theme");
-    const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    
+    let isDark = false;
+    
+    if (explicitTheme) {
+      // Explicit theme attribute takes priority
+      isDark = explicitTheme === "dark";
+    } else {
+      // Auto-detect theme from various sources
+      isDark = this.detectDarkMode();
+    }
 
-    if (explicitTheme === "dark" || (explicitTheme !== "light" && prefersDarkScheme)) {
+    if (isDark) {
       container.classList.add("dark-mode");
     } else {
       container.classList.remove("dark-mode");
     }
+  }
+
+  detectDarkMode() {
+    // Check common theme indicators
+    const html = document.documentElement;
+    const body = document.body;
+    
+    // Check data-theme attribute (like your portfolio)
+    const dataTheme = html.getAttribute('data-theme') || body.getAttribute('data-theme');
+    if (dataTheme === 'dark') return true;
+    if (dataTheme === 'light') return false;
+    
+    // Check common class names
+    if (html.classList.contains('dark') || body.classList.contains('dark')) return true;
+    if (html.classList.contains('dark-mode') || body.classList.contains('dark-mode')) return true;
+    if (html.classList.contains('theme-dark') || body.classList.contains('theme-dark')) return true;
+    
+    // Fall back to system preference
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
   }
 
   get styles() {
