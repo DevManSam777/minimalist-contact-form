@@ -1,4 +1,4 @@
-# Contact Form Web Component
+# Minimalist Contact Form Web Component
 
 A lightweight, customizable web component for collecting contact inquiries. This component provides a clean, professional contact form with built-in validation and modern styling that can be embedded anywhere.
 
