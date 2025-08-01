@@ -8,7 +8,7 @@ class ContactForm extends HTMLElement {
     return [
       'endpoint', 'primary-color', 'background-color', 'text-color', 'border-color', 
       'border-radius', 'font-family', 'font-size', 'google-font', 'success-message', 
-      'error-message', 'auto-dark-mode', 'dark-primary-color', 'dark-background-color', 
+      'error-message', 'auto-dark-mode', 'theme', 'dark-primary-color', 'dark-background-color', 
       'dark-text-color', 'dark-border-color'
     ];
   }
@@ -34,8 +34,19 @@ class ContactForm extends HTMLElement {
   }
 
   get styles() {
+    const explicitTheme = this.getAttribute('theme');
     const autoDarkMode = this.getAttribute('auto-dark-mode') === 'true';
-    const isDarkMode = autoDarkMode && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    // Determine if we should use dark mode
+    let isDarkMode = false;
+    if (explicitTheme) {
+      // Manual theme override takes priority
+      isDarkMode = explicitTheme === 'dark';
+    } else if (autoDarkMode) {
+      // Fall back to system preference if auto-dark-mode is enabled
+      isDarkMode = systemPrefersDark;
+    }
 
     let primaryColor, backgroundColor, textColor, borderColor;
 
