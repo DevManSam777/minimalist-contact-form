@@ -7,23 +7,28 @@ class ContactForm extends HTMLElement {
 
   static get observedAttributes() {
     return [
-      'endpoint', 'theme', 'primary-color', 'background-color', 'text-color', 'border-color', 
-      'border-radius', 'font-family', 'font-size', 'google-font', 'success-message', 
-      'error-message', 'dark-primary-color', 'dark-background-color', 
+      'endpoint', 'theme', 'primary-color', 'background-color', 'text-color', 'border-color',
+      'border-radius', 'font-family', 'font-size', 'google-font', 'success-message',
+      'error-message', 'dark-primary-color', 'dark-background-color',
       'dark-text-color', 'dark-border-color'
     ];
   }
 
   connectedCallback() {
+    // Render the initial structure immediately
+    this.render();
+
+    // Load Google Font and then update styles
     this.loadGoogleFont().then(() => {
-      this.render();
-      this.loadCleavejs().then(() => {
-        this.initializePhoneFormatting();
-      });
-      this.setupEventListeners();
-      this.updateTheme();
-      this.setupThemeWatchers();
+      this.updateStyles(); // <--- Add this
     });
+
+    this.loadCleavejs().then(() => {
+      this.initializePhoneFormatting();
+    });
+    this.setupEventListeners();
+    this.updateTheme();
+    this.setupThemeWatchers();
   }
 
   disconnectedCallback() {
@@ -37,10 +42,12 @@ class ContactForm extends HTMLElement {
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (oldValue === newValue) return;
-    
+
     if (name === "theme") {
       this.updateTheme();
     } else if (name === "google-font") {
+      // When google-font changes, reset the loaded flag and re-load/update
+      this.googleFontLoaded = false; // Important: Reset the flag
       this.loadGoogleFont().then(() => {
         this.updateStyles();
       });
@@ -53,15 +60,17 @@ class ContactForm extends HTMLElement {
   loadGoogleFont() {
     return new Promise((resolve) => {
       const googleFont = this.getAttribute('google-font');
-      
-      if (!googleFont || this.googleFontLoaded) {
+
+      if (!googleFont) { // If no google-font attribute, resolve immediately
+        this.googleFontLoaded = false; // Ensure flag is false if no font is specified
         resolve();
         return;
       }
 
-      // Check if font is already loaded
+      // Check if font is already loaded or being loaded
       const existingLink = document.head.querySelector(`link[href*="fonts.googleapis.com"][href*="${googleFont.replace(/\s+/g, '+')}"]`);
       if (existingLink) {
+        // If the font is already in the head, assume it's loaded or will be
         this.googleFontLoaded = true;
         resolve();
         return;
@@ -71,17 +80,18 @@ class ContactForm extends HTMLElement {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
       link.href = `https://fonts.googleapis.com/css2?family=${googleFont.replace(/\s+/g, '+')}:wght@400;500;600&display=swap`;
-      
+
       link.onload = () => {
         this.googleFontLoaded = true;
         resolve();
       };
-      
+
       link.onerror = () => {
         console.warn(`Failed to load Google Font: ${googleFont}`);
+        this.googleFontLoaded = false; // Font failed to load
         resolve();
       };
-      
+
       document.head.appendChild(link);
     });
   }
@@ -119,9 +129,9 @@ class ContactForm extends HTMLElement {
     if (!container) return;
 
     const explicitTheme = this.getAttribute("theme");
-    
+
     let isDark = false;
-    
+
     if (explicitTheme) {
       // Explicit theme attribute takes priority
       isDark = explicitTheme === "dark";
@@ -141,17 +151,17 @@ class ContactForm extends HTMLElement {
     // Check common theme indicators
     const html = document.documentElement;
     const body = document.body;
-    
+
     // Check data-theme attribute
     const dataTheme = html.getAttribute('data-theme') || body.getAttribute('data-theme');
     if (dataTheme === 'dark') return true;
     if (dataTheme === 'light') return false;
-    
+
     // Check common class names
     if (html.classList.contains('dark') || body.classList.contains('dark')) return true;
     if (html.classList.contains('dark-mode') || body.classList.contains('dark-mode')) return true;
     if (html.classList.contains('theme-dark') || body.classList.contains('theme-dark')) return true;
-    
+
     // Fall back to system preference
     return window.matchMedia("(prefers-color-scheme: dark)").matches;
   }
@@ -159,7 +169,8 @@ class ContactForm extends HTMLElement {
   getFontFamily() {
     const googleFont = this.getAttribute('google-font');
     const customFontFamily = this.getAttribute('font-family');
-    
+
+    // Only apply googleFont if it's specified and confirmed loaded
     if (googleFont && this.googleFontLoaded) {
       return `"${googleFont}", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
     } else if (customFontFamily) {
@@ -352,8 +363,14 @@ class ContactForm extends HTMLElement {
   }
 
   render() {
+    // We create the style tag only once, then update its content
+    if (!this.shadowRoot.querySelector('style')) {
+      const styleTag = document.createElement('style');
+      this.shadowRoot.appendChild(styleTag);
+    }
+
     this.shadowRoot.innerHTML = `
-      <style>${this.styles}</style>
+      ${this.shadowRoot.querySelector('style').outerHTML}
       <form class="contact-form">
         <div id="message-container"></div>
         <div class="name-row">
@@ -381,15 +398,16 @@ class ContactForm extends HTMLElement {
         <button type="submit" class="submit-btn">Send Message</button>
       </form>
     `;
+    this.updateStyles(); // Ensure styles are applied after initial render
   }
 
   setupEventListeners() {
     const form = this.shadowRoot.querySelector('form');
     const submitBtn = this.shadowRoot.querySelector('.submit-btn');
-    
+
     // Initialize validation
     this.initializeValidation();
-    
+
     submitBtn.addEventListener('click', (e) => {
       e.preventDefault();
       this.handleSubmit();
@@ -413,7 +431,7 @@ class ContactForm extends HTMLElement {
 
   initializePhoneFormatting() {
     const phoneInput = this.shadowRoot.querySelector('#phone');
-    
+
     if (window.Cleave && phoneInput) {
       new window.Cleave(phoneInput, {
         numericOnly: true,
@@ -426,7 +444,7 @@ class ContactForm extends HTMLElement {
   initializeValidation() {
     const form = this.shadowRoot.querySelector('form');
     const inputs = form.querySelectorAll('input, textarea');
-    
+
     inputs.forEach(input => {
       input.addEventListener('blur', () => this.validateField(input));
       input.addEventListener('input', () => {
@@ -439,27 +457,27 @@ class ContactForm extends HTMLElement {
 
   validateField(field) {
     this.removeError(field);
-    
+
     const value = field.value.trim();
-    
+
     // Check required fields
     if (field.required && !value) {
       this.showError(field, 'This field is required');
       return false;
     }
-    
+
     // Name validation (at least 1 character)
     if ((field.name === 'firstName' || field.name === 'lastName') && value && value.length < 1) {
       this.showError(field, 'Name must be at least 1 character');
       return false;
     }
-    
-    // Message validation (at least 1 character) 
+
+    // Message validation (at least 1 character)
     if (field.name === 'message' && value && value.length < 1) {
       this.showError(field, 'Message must be at least 1 character');
       return false;
     }
-    
+
     // Email validation
     if (field.type === 'email' && value) {
       if (!this.isValidEmail(value)) {
@@ -467,7 +485,7 @@ class ContactForm extends HTMLElement {
         return false;
       }
     }
-    
+
     // Phone validation
     if (field.type === 'tel' && value) {
       if (!this.isValidPhone(value)) {
@@ -475,7 +493,7 @@ class ContactForm extends HTMLElement {
         return false;
       }
     }
-    
+
     field.classList.add('valid');
     field.classList.remove('invalid');
     return true;
@@ -483,12 +501,12 @@ class ContactForm extends HTMLElement {
 
   showError(input, message) {
     this.removeError(input);
-    
+
     const errorDiv = document.createElement('div');
     errorDiv.className = 'error-message';
     errorDiv.textContent = message;
     input.parentElement.appendChild(errorDiv);
-    
+
     input.classList.add('invalid');
     input.classList.remove('valid');
   }
@@ -513,13 +531,13 @@ class ContactForm extends HTMLElement {
     const form = this.shadowRoot.querySelector('form');
     const inputs = form.querySelectorAll('input[required], textarea[required]');
     let isValid = true;
-    
+
     inputs.forEach(input => {
       if (!this.validateField(input)) {
         isValid = false;
       }
     });
-    
+
     return isValid;
   }
 
@@ -539,20 +557,20 @@ class ContactForm extends HTMLElement {
     const form = this.shadowRoot.querySelector('form');
     const formData = new FormData(form);
     const submitBtn = this.shadowRoot.querySelector('.submit-btn');
-    
+
     // Show loading state
     const originalText = submitBtn.textContent;
     submitBtn.textContent = 'Sending...';
     submitBtn.disabled = true;
-    
+
     // Send data in the format your email system expects
     const data = {
       firstName: formData.get('firstName'),
-      lastName: formData.get('lastName'), 
+      lastName: formData.get('lastName'),
       email: formData.get('email'),
       phone: formData.get('phone'),
       message: formData.get('message'),
-      
+
       // DevLeads integration fields - auto-generated
       businessName: `${formData.get('firstName')} ${formData.get('lastName')}`,
       businessPhone: '',
@@ -561,17 +579,17 @@ class ContactForm extends HTMLElement {
       businessServices: '',
       phoneExt: '',
       textNumber: '',
-      
+
       // DevLeads integration fields - service details
       preferredContact: 'email',
       serviceDesired: 'Web Development',
       hasWebsite: 'no',
       websiteAddress: '',
-      
+
       // DevLeads integration fields - billing address (required for email template)
       billingStreet: 'N/A',
       billingAptUnit: '',
-      billingCity: 'N/A', 
+      billingCity: 'N/A',
       billingState: 'N/A',
       billingZipCode: '00000',
       billingCountry: 'USA',
@@ -583,7 +601,7 @@ class ContactForm extends HTMLElement {
         zipCode: '00000',
         country: 'USA'
       },
-      
+
       // DevLeads integration fields - form submission flag
       isFormSubmission: true
     };
@@ -625,7 +643,7 @@ class ContactForm extends HTMLElement {
   showMessage(text, type) {
     const container = this.shadowRoot.querySelector('#message-container');
     container.innerHTML = `<div class="message ${type}">${text}</div>`;
-    
+
     if (type === 'success') {
       setTimeout(() => {
         container.innerHTML = '';
