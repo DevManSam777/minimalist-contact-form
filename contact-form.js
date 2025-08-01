@@ -5,7 +5,12 @@ class ContactForm extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['endpoint', 'primary-color', 'background-color', 'text-color', 'border-radius', 'success-message', 'error-message'];
+    return [
+      'endpoint', 'primary-color', 'background-color', 'text-color', 'border-color', 
+      'border-radius', 'font-family', 'font-size', 'google-font', 'success-message', 
+      'error-message', 'auto-dark-mode', 'dark-primary-color', 'dark-background-color', 
+      'dark-text-color', 'dark-border-color'
+    ];
   }
 
   connectedCallback() {
@@ -14,19 +19,47 @@ class ContactForm extends HTMLElement {
       this.initializePhoneFormatting();
     });
     this.setupEventListeners();
+    
+    if (this.getAttribute('auto-dark-mode') === 'true') {
+      this.darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      this.handleDarkModeChange = () => this.render();
+      this.darkModeMediaQuery.addEventListener('change', this.handleDarkModeChange);
+    }
+  }
+
+  disconnectedCallback() {
+    if (this.darkModeMediaQuery && this.handleDarkModeChange) {
+      this.darkModeMediaQuery.removeEventListener('change', this.handleDarkModeChange);
+    }
   }
 
   get styles() {
-    const primaryColor = this.getAttribute('primary-color') || '#3b82f6';
-    const backgroundColor = this.getAttribute('background-color') || '#ffffff';
-    const textColor = this.getAttribute('text-color') || '#374151';
+    const autoDarkMode = this.getAttribute('auto-dark-mode') === 'true';
+    const isDarkMode = autoDarkMode && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    let primaryColor, backgroundColor, textColor, borderColor;
+
+    if (isDarkMode) {
+      primaryColor = this.getAttribute('dark-primary-color') || this.getAttribute('primary-color') || '#60a5fa';
+      backgroundColor = this.getAttribute('dark-background-color') || this.getAttribute('background-color') || '#1f2937';
+      textColor = this.getAttribute('dark-text-color') || this.getAttribute('text-color') || '#f9fafb';
+      borderColor = this.getAttribute('dark-border-color') || this.getAttribute('border-color') || '#4b5563';
+    } else {
+      primaryColor = this.getAttribute('primary-color') || '#3b82f6';
+      backgroundColor = this.getAttribute('background-color') || '#ffffff';
+      textColor = this.getAttribute('text-color') || '#374151';
+      borderColor = this.getAttribute('border-color') || '#d1d5db';
+    }
+
     const borderRadius = this.getAttribute('border-radius') || '6px';
+    const fontFamily = this.getAttribute('font-family') || '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    const fontSize = this.getAttribute('font-size') || '14px';
 
     return `
       :host {
         display: block;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        font-size: 14px;
+        font-family: ${fontFamily};
+        font-size: ${fontSize};
       }
 
       .contact-form {
@@ -52,10 +85,10 @@ class ContactForm extends HTMLElement {
       input, textarea {
         width: 100%;
         padding: 0.75rem;
-        border: 2px solid #d1d5db;
+        border: 2px solid ${borderColor};
         border-radius: ${borderRadius};
-        font-size: 14px;
-        font-family: inherit;
+        font-size: ${fontSize};
+        font-family: ${fontFamily};
         color: ${textColor};
         background: ${backgroundColor};
         transition: border-color 0.2s ease;
@@ -84,7 +117,7 @@ class ContactForm extends HTMLElement {
         border: none;
         padding: 0.875rem 2rem;
         border-radius: ${borderRadius};
-        font-size: 14px;
+        font-size: ${fontSize};
         font-weight: 500;
         cursor: pointer;
         transition: opacity 0.2s ease;
