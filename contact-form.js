@@ -2,6 +2,7 @@ class ContactForm extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
+    this.googleFontLoaded = false;
   }
 
   static get observedAttributes() {
@@ -14,13 +15,15 @@ class ContactForm extends HTMLElement {
   }
 
   connectedCallback() {
-    this.render();
-    this.loadCleavejs().then(() => {
-      this.initializePhoneFormatting();
+    this.loadGoogleFont().then(() => {
+      this.render();
+      this.loadCleavejs().then(() => {
+        this.initializePhoneFormatting();
+      });
+      this.setupEventListeners();
+      this.updateTheme();
+      this.setupThemeWatchers();
     });
-    this.setupEventListeners();
-    this.updateTheme();
-    this.setupThemeWatchers();
   }
 
   disconnectedCallback() {
@@ -33,9 +36,54 @@ class ContactForm extends HTMLElement {
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue === newValue) return;
+    
     if (name === "theme") {
       this.updateTheme();
+    } else if (name === "google-font") {
+      this.loadGoogleFont().then(() => {
+        this.updateStyles();
+      });
+    } else {
+      // Re-render styles for other attribute changes
+      this.updateStyles();
     }
+  }
+
+  loadGoogleFont() {
+    return new Promise((resolve) => {
+      const googleFont = this.getAttribute('google-font');
+      
+      if (!googleFont || this.googleFontLoaded) {
+        resolve();
+        return;
+      }
+
+      // Check if font is already loaded
+      const existingLink = document.head.querySelector(`link[href*="fonts.googleapis.com"][href*="${googleFont.replace(/\s+/g, '+')}"]`);
+      if (existingLink) {
+        this.googleFontLoaded = true;
+        resolve();
+        return;
+      }
+
+      // Create and load Google Font
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = `https://fonts.googleapis.com/css2?family=${googleFont.replace(/\s+/g, '+')}:wght@400;500;600&display=swap`;
+      
+      link.onload = () => {
+        this.googleFontLoaded = true;
+        resolve();
+      };
+      
+      link.onerror = () => {
+        console.warn(`Failed to load Google Font: ${googleFont}`);
+        resolve();
+      };
+      
+      document.head.appendChild(link);
+    });
   }
 
   setupThemeWatchers() {
@@ -94,7 +142,7 @@ class ContactForm extends HTMLElement {
     const html = document.documentElement;
     const body = document.body;
     
-    // Check data-theme attribute (like your portfolio)
+    // Check data-theme attribute
     const dataTheme = html.getAttribute('data-theme') || body.getAttribute('data-theme');
     if (dataTheme === 'dark') return true;
     if (dataTheme === 'light') return false;
@@ -108,13 +156,26 @@ class ContactForm extends HTMLElement {
     return window.matchMedia("(prefers-color-scheme: dark)").matches;
   }
 
+  getFontFamily() {
+    const googleFont = this.getAttribute('google-font');
+    const customFontFamily = this.getAttribute('font-family');
+    
+    if (googleFont && this.googleFontLoaded) {
+      return `"${googleFont}", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+    } else if (customFontFamily) {
+      return customFontFamily;
+    } else {
+      return '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    }
+  }
+
   get styles() {
     const primaryColor = this.getAttribute('primary-color') || '#3b82f6';
     const backgroundColor = this.getAttribute('background-color') || '#ffffff';
     const textColor = this.getAttribute('text-color') || '#374151';
     const borderColor = this.getAttribute('border-color') || '#d1d5db';
     const borderRadius = this.getAttribute('border-radius') || '6px';
-    const fontFamily = this.getAttribute('font-family') || '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    const fontFamily = this.getFontFamily();
     const fontSize = this.getAttribute('font-size') || '14px';
 
     const darkPrimaryColor = this.getAttribute('dark-primary-color') || '#60a5fa';
@@ -137,6 +198,7 @@ class ContactForm extends HTMLElement {
         margin: 0 auto;
         box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4), 0 12px 24px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.2);
         border: 1px solid rgba(255, 255, 255, 0.1);
+        font-family: ${fontFamily};
       }
 
       .form-group {
@@ -148,6 +210,7 @@ class ContactForm extends HTMLElement {
         margin-bottom: 0.5rem;
         font-weight: 500;
         color: ${textColor};
+        font-family: ${fontFamily};
       }
 
       input, textarea {
@@ -187,6 +250,7 @@ class ContactForm extends HTMLElement {
         border-radius: ${borderRadius};
         font-size: ${fontSize};
         font-weight: 500;
+        font-family: ${fontFamily};
         cursor: pointer;
         transition: opacity 0.2s ease;
         width: 100%;
@@ -207,6 +271,7 @@ class ContactForm extends HTMLElement {
         margin-bottom: 1rem;
         text-align: center;
         font-weight: 500;
+        font-family: ${fontFamily};
       }
 
       .success {
@@ -236,6 +301,7 @@ class ContactForm extends HTMLElement {
         font-size: 12px;
         margin-top: 4px;
         font-weight: 500;
+        font-family: ${fontFamily};
       }
 
       /* Dark Mode */
@@ -263,7 +329,26 @@ class ContactForm extends HTMLElement {
       .dark-mode .submit-btn {
         background: ${darkPrimaryColor};
       }
+
+      .dark-mode .success {
+        background: rgba(34, 197, 94, 0.1);
+        color: #4ade80;
+        border: 1px solid rgba(34, 197, 94, 0.3);
+      }
+
+      .dark-mode .error {
+        background: rgba(239, 68, 68, 0.1);
+        color: #f87171;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+      }
     `;
+  }
+
+  updateStyles() {
+    const styleTag = this.shadowRoot.querySelector('style');
+    if (styleTag) {
+      styleTag.textContent = this.styles;
+    }
   }
 
   render() {
@@ -453,6 +538,12 @@ class ContactForm extends HTMLElement {
 
     const form = this.shadowRoot.querySelector('form');
     const formData = new FormData(form);
+    const submitBtn = this.shadowRoot.querySelector('.submit-btn');
+    
+    // Show loading state
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Sending...';
+    submitBtn.disabled = true;
     
     // Send data in the format your email system expects
     const data = {
@@ -524,6 +615,10 @@ class ContactForm extends HTMLElement {
       console.error('Full error:', error);
       const errorMessage = this.getAttribute('error-message') || 'Failed to send message. Please try again.';
       this.showMessage(errorMessage, 'error');
+    } finally {
+      // Reset button state
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
     }
   }
 
