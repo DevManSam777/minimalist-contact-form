@@ -339,6 +339,11 @@ export default async function handler(req, res) {
 }
 ```
 
+##### HTML
+```html
+<contact-form endpoint="/api/contact"></contact-form>
+```
+
 ### With Netlify Functions
 ```javascript
 // netlify/functions/contact.js
@@ -352,6 +357,10 @@ exports.handler = async (event, context) => {
     body: JSON.stringify({ message: 'Success!' })
   };
 }
+```
+##### HTML
+```html
+<contact-form endpoint="/.netlify/functions/contact"></contact-form>
 ```
 
 ## Need a complete backend solution?
