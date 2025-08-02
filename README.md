@@ -2,7 +2,11 @@
 
 A lightweight, customizable web component for collecting contact inquiries. This component provides a clean, professional contact form with built-in validation and modern styling that can be embedded anywhere.
 
-![form](form.png)
+![default styles](assets/form.png)
+
+![light mode examples](assets/light.png)
+
+![dark mode examples](assets/dark.png)
 
 ## Features
 
