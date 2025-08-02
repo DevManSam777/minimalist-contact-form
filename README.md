@@ -244,43 +244,7 @@ The server should respond with:
 - **Success**: 200/201 status code
 - **Error**: 4xx/5xx status code with optional error message
 
-## Styling Examples
 
-### Modern Glassmorphism
-```html
-<contact-form
-  endpoint="https://your-api.com/contact"
-  primary-color="#6366f1"
-  background-color="rgba(255, 255, 255, 0.9)"
-  border-radius="16px"
-  google-font="Inter"
-></contact-form>
-```
-
-### Dark Theme
-```html
-<contact-form
-  endpoint="https://your-api.com/contact"
-  primary-color="#3b82f6"
-  background-color="#1f2937"
-  text-color="#f9fafb"
-  border-color="#4b5563"
-  border-radius="8px"
-></contact-form>
-```
-
-### Colorful Design
-```html
-<contact-form
-  endpoint="https://your-api.com/contact"
-  primary-color="#10b981"
-  background-color="#ffffff"
-  text-color="#374151"
-  border-radius="0"
-  font-size="16px"
-  google-font="Poppins"
-></contact-form>
-```
 
 ## Browser Compatibility
 
