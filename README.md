@@ -138,7 +138,7 @@ The contact form includes the following fields:
 - **First Name** (required) - Minimum 1 character
 - **Last Name** (required) - Minimum 1 character  
 - **Email** (required) - Valid email format
-- **Phone** (required) - Formatted as XXX-XXX-XXXX
+- **Phone** (optional) - Formatted as XXX-XXX-XXXX 
 - **Message** (required) - Minimum 1 character
 
 ## Validation
