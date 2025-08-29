@@ -116,10 +116,12 @@ Set a custom API endpoint for form submission:
 | Attribute | Description | Default |
 |-----------|-------------|---------|
 | `endpoint` | API endpoint URL for form submission | Required |
+| `heading` | Optional form heading/title | None |
 | `primary-color` | Main button/accent color | `#3b82f6` |
 | `background-color` | Form background color | `#ffffff` |
 | `text-color` | Text color | `#374151` |
 | `border-color` | Input border color | `#d1d5db` |
+| `input-background-color` | Input field background color | Same as `background-color` |
 | `border-radius` | Corner roundness | `6px` |
 | `font-family` | Custom font family | System fonts |
 | `font-size` | Base font size | `14px` |
@@ -130,6 +132,7 @@ Set a custom API endpoint for form submission:
 | `dark-background-color` | Background color for dark mode | `#1f2937` |
 | `dark-text-color` | Text color for dark mode | `#f9fafb` |
 | `dark-border-color` | Border color for dark mode | `#4b5563` |
+| `dark-input-background-color` | Input field background color for dark mode | Same as `dark-background-color` |
 
 ## Form Fields
 

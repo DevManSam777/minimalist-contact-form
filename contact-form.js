@@ -9,8 +9,8 @@ class ContactForm extends HTMLElement {
     return [
       'endpoint', 'theme', 'primary-color', 'background-color', 'text-color', 'border-color',
       'border-radius', 'font-family', 'font-size', 'google-font', 'success-message',
-      'error-message', 'dark-primary-color', 'dark-background-color',
-      'dark-text-color', 'dark-border-color'
+      'error-message', 'input-background-color', 'heading', 'dark-primary-color', 'dark-background-color',
+      'dark-text-color', 'dark-border-color', 'dark-input-background-color'
     ];
   }
 
@@ -178,11 +178,13 @@ class ContactForm extends HTMLElement {
     const borderRadius = this.getAttribute('border-radius') || '6px';
     const fontFamily = this.getFontFamily();
     const fontSize = this.getAttribute('font-size') || '14px';
+    const inputBackgroundColor = this.getAttribute('input-background-color') || backgroundColor;
 
     const darkPrimaryColor = this.getAttribute('dark-primary-color') || '#60a5fa';
     const darkBackgroundColor = this.getAttribute('dark-background-color') || '#1f2937';
     const darkTextColor = this.getAttribute('dark-text-color') || '#f9fafb';
     const darkBorderColor = this.getAttribute('dark-border-color') || '#4b5563';
+    const darkInputBackgroundColor = this.getAttribute('dark-input-background-color') || darkBackgroundColor;
 
     return `
       :host {
@@ -201,6 +203,16 @@ class ContactForm extends HTMLElement {
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.1);
         font-family: ${fontFamily};
+      }
+
+      .form-heading {
+        margin: 0 0 1.5rem 0;
+        padding: 0;
+        font-size: 1.5em;
+        font-weight: bold;
+        color: ${textColor};
+        font-family: ${fontFamily};
+        text-align: center;
       }
 
       .form-group {
@@ -223,7 +235,7 @@ class ContactForm extends HTMLElement {
         font-size: ${fontSize};
         font-family: ${fontFamily};
         color: ${textColor};
-        background: ${backgroundColor};
+        background: ${inputBackgroundColor};
         transition: border-color 0.2s ease;
         box-sizing: border-box;
       }
@@ -316,9 +328,13 @@ class ContactForm extends HTMLElement {
         color: ${darkTextColor};
       }
 
+      .dark-mode .form-heading {
+        color: ${darkTextColor};
+      }
+
       .dark-mode input,
       .dark-mode textarea {
-        background: ${darkBackgroundColor};
+        background: ${darkInputBackgroundColor};
         color: ${darkTextColor};
         border-color: ${darkBorderColor};
       }
@@ -359,9 +375,13 @@ class ContactForm extends HTMLElement {
       this.shadowRoot.appendChild(styleTag);
     }
 
+    const heading = this.getAttribute('heading');
+    const headingHtml = heading ? `<h2 class="form-heading">${heading}</h2>` : '';
+    
     this.shadowRoot.innerHTML = `
       ${this.shadowRoot.querySelector('style').outerHTML}
       <form class="contact-form">
+        ${headingHtml}
         <div id="message-container"></div>
         <div class="name-row">
           <div class="form-group">
