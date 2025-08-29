@@ -186,7 +186,7 @@ The form submits the following data structure to your API:
 
 ### Complete Data Structure (DevLeads Integration)
 
-For compatibility with DevLeads, the component sends a complete data structure with default values. You can modify the component HTML to add input fields for any of these additional fields:
+For compatibility with DevLeads, the component sends a complete data structure with default values. You can modify the component HTML to add input fields for any of these additional fields (must clone repo and setup your own cdn delivery or add web component javascript file to your project):
 
 ```javascript
 {
