@@ -25,7 +25,7 @@ A lightweight, customizable web component for collecting contact inquiries. This
 #### Via CDN (preferred)
 
 ```html
-<script src="https://raw.githack.com/DevManSam777/minimalist-contact-form/main/contact-form.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/DevManSam777/minimalist-contact-form@main/contact-form.js" defer></script>
 ```
 
 #### Alternatively 
