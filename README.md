@@ -22,7 +22,13 @@ A lightweight, customizable web component for collecting contact inquiries. This
 
 ## Installation
 
-### npm Package (Recommended)
+### CDN
+
+```html
+<script src="https://cdn.jsdelivr.net/gh/DevManSam777/minimalist-contact-form@latest/contact-form.js" defer></script>
+```
+
+### npm
 
 Install the package:
 
@@ -33,18 +39,7 @@ npm install @devmansam/forms
 Import in your JavaScript/TypeScript:
 
 ```javascript
-// Import the contact form
 import '@devmansam/forms/contact-form';
-```
-
-> **Note**: The `@devmansam/forms` package includes both the contact form and web inquiry form. You can import them individually as shown above, or import both with `import '@devmansam/forms'`.
-
-For bundlers like Vite, Webpack, or Rollup, this is the recommended approach. The forms are native Web Components and work with any framework (React, Vue, Angular, Svelte, etc.) or vanilla JavaScript.
-
-### CDN
-
-```html
-<script src="https://cdn.jsdelivr.net/gh/DevManSam777/minimalist-contact-form@main/contact-form.js" defer></script>
 ```
 
 ## Basic Usage
