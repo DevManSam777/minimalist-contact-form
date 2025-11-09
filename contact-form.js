@@ -10,7 +10,8 @@ class ContactForm extends HTMLElement {
       'endpoint', 'theme', 'primary-color', 'background-color', 'text-color', 'border-color',
       'border-radius', 'font-family', 'font-size', 'google-font', 'success-message',
       'error-message', 'input-background-color', 'heading', 'dark-primary-color', 'dark-background-color',
-      'dark-text-color', 'dark-border-color', 'dark-input-background-color'
+      'dark-text-color', 'dark-border-color', 'dark-input-background-color', 'button-text-color',
+      'dark-button-text-color'
     ];
   }
 
@@ -179,12 +180,14 @@ class ContactForm extends HTMLElement {
     const fontFamily = this.getFontFamily();
     const fontSize = this.getAttribute('font-size') || '14px';
     const inputBackgroundColor = this.getAttribute('input-background-color') || backgroundColor;
+    const buttonTextColor = this.getAttribute('button-text-color') || '#ffffff';
 
     const darkPrimaryColor = this.getAttribute('dark-primary-color') || '#60a5fa';
     const darkBackgroundColor = this.getAttribute('dark-background-color') || '#1f2937';
     const darkTextColor = this.getAttribute('dark-text-color') || '#f9fafb';
     const darkBorderColor = this.getAttribute('dark-border-color') || '#4b5563';
     const darkInputBackgroundColor = this.getAttribute('dark-input-background-color') || darkBackgroundColor;
+    const darkButtonTextColor = this.getAttribute('dark-button-text-color') || '#ffffff';
 
     return `
       :host {
@@ -259,7 +262,7 @@ class ContactForm extends HTMLElement {
 
       .submit-btn {
         background: ${primaryColor};
-        color: white;
+        color: ${buttonTextColor};
         border: none;
         padding: 0.875rem 2rem;
         border-radius: ${borderRadius};
@@ -347,6 +350,7 @@ class ContactForm extends HTMLElement {
 
       .dark-mode .submit-btn {
         background: ${darkPrimaryColor};
+        color: ${darkButtonTextColor};
       }
 
       .dark-mode .success {
