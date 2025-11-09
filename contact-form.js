@@ -217,6 +217,7 @@ class ContactForm extends HTMLElement {
         color: ${textColor};
         font-family: ${fontFamily};
         text-align: center;
+        letter-spacing: 1px;
       }
 
       .form-group {
@@ -229,6 +230,7 @@ class ContactForm extends HTMLElement {
         font-weight: 500;
         color: ${textColor};
         font-family: ${fontFamily};
+        letter-spacing: 0.75px;
       }
 
       input, textarea {
@@ -242,6 +244,7 @@ class ContactForm extends HTMLElement {
         background: ${inputBackgroundColor};
         transition: border-color 0.2s ease;
         box-sizing: border-box;
+        letter-spacing: 0.75px;
       }
 
       input:focus, textarea:focus {
@@ -272,6 +275,7 @@ class ContactForm extends HTMLElement {
         cursor: pointer;
         transition: opacity 0.2s ease;
         width: 100%;
+        letter-spacing: 0.75px;
       }
 
       .submit-btn:hover:not(:disabled) {
@@ -290,6 +294,7 @@ class ContactForm extends HTMLElement {
         text-align: center;
         font-weight: 500;
         font-family: ${fontFamily};
+        letter-spacing: 0.75px;
       }
 
       .success {
@@ -320,6 +325,7 @@ class ContactForm extends HTMLElement {
         margin-top: 4px;
         font-weight: 500;
         font-family: ${fontFamily};
+        letter-spacing: 0.75px;
       }
 
       /* Dark Mode */
