@@ -9,9 +9,10 @@ class ContactForm extends HTMLElement {
     return [
       'endpoint', 'theme', 'primary-color', 'background-color', 'text-color', 'border-color',
       'border-radius', 'font-family', 'font-size', 'google-font', 'success-message',
-      'error-message', 'input-background-color', 'heading', 'dark-primary-color', 'dark-background-color',
-      'dark-text-color', 'dark-border-color', 'dark-input-background-color', 'button-text-color',
-      'dark-button-text-color'
+      'error-message', 'input-background-color', 'input-text-color', 'input-border-color',
+      'heading', 'dark-primary-color', 'dark-background-color', 'dark-text-color', 'dark-border-color',
+      'dark-input-background-color', 'dark-input-text-color', 'dark-input-border-color',
+      'button-text-color', 'dark-button-text-color'
     ];
   }
 
@@ -180,6 +181,8 @@ class ContactForm extends HTMLElement {
     const fontFamily = this.getFontFamily();
     const fontSize = this.getAttribute('font-size') || '14px';
     const inputBackgroundColor = this.getAttribute('input-background-color') || backgroundColor;
+    const inputTextColor = this.getAttribute('input-text-color') || textColor;
+    const inputBorderColor = this.getAttribute('input-border-color') || borderColor;
     const buttonTextColor = this.getAttribute('button-text-color') || '#ffffff';
 
     const darkPrimaryColor = this.getAttribute('dark-primary-color') || '#60a5fa';
@@ -187,6 +190,8 @@ class ContactForm extends HTMLElement {
     const darkTextColor = this.getAttribute('dark-text-color') || '#f9fafb';
     const darkBorderColor = this.getAttribute('dark-border-color') || '#4b5563';
     const darkInputBackgroundColor = this.getAttribute('dark-input-background-color') || darkBackgroundColor;
+    const darkInputTextColor = this.getAttribute('dark-input-text-color') || darkTextColor;
+    const darkInputBorderColor = this.getAttribute('dark-input-border-color') || darkBorderColor;
     const darkButtonTextColor = this.getAttribute('dark-button-text-color') || '#ffffff';
 
     return `
@@ -236,11 +241,11 @@ class ContactForm extends HTMLElement {
       input, textarea {
         width: 100%;
         padding: 0.75rem;
-        border: 2px solid ${borderColor};
+        border: 2px solid ${inputBorderColor};
         border-radius: ${borderRadius};
         font-size: ${fontSize};
         font-family: ${fontFamily};
-        color: ${textColor};
+        color: ${inputTextColor};
         background: ${inputBackgroundColor};
         transition: border-color 0.2s ease;
         box-sizing: border-box;
@@ -345,8 +350,8 @@ class ContactForm extends HTMLElement {
       .dark-mode input,
       .dark-mode textarea {
         background: ${darkInputBackgroundColor};
-        color: ${darkTextColor};
-        border-color: ${darkBorderColor};
+        color: ${darkInputTextColor};
+        border-color: ${darkInputBorderColor};
       }
 
       .dark-mode input:focus,
