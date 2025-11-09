@@ -203,6 +203,7 @@ class ContactForm extends HTMLElement {
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.1);
         font-family: ${fontFamily};
+        box-sizing: border-box;
       }
 
       .form-heading {
@@ -364,6 +365,7 @@ class ContactForm extends HTMLElement {
       @media (max-width: 480px) {
         .name-row {
           grid-template-columns: 1fr;
+          gap: 0;
         }
       }
     `;
