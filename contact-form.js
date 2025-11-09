@@ -367,9 +367,36 @@ class ContactForm extends HTMLElement {
 
       /* Responsive */
       @media (max-width: 480px) {
+        .contact-form {
+          padding: 1.25rem;
+        }
+
+        .form-heading {
+          font-size: 1.25em;
+          margin-bottom: 1rem;
+        }
+
+        label {
+          font-size: 0.875em;
+        }
+
+        input, textarea {
+          padding: 0.625rem;
+          font-size: 0.875em;
+        }
+
+        .submit-btn {
+          padding: 0.75rem 1.5rem;
+          font-size: 0.875em;
+        }
+
         .name-row {
           grid-template-columns: 1fr;
           gap: 0;
+        }
+
+        .form-group {
+          margin-bottom: 1.25rem;
         }
       }
     `;
