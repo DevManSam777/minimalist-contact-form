@@ -359,6 +359,13 @@ class ContactForm extends HTMLElement {
         color: #f87171;
         border: 1px solid rgba(239, 68, 68, 0.3);
       }
+
+      /* Responsive */
+      @media (max-width: 480px) {
+        .name-row {
+          grid-template-columns: 1fr;
+        }
+      }
     `;
   }
 
