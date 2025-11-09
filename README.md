@@ -131,26 +131,41 @@ Set a custom API endpoint for form submission:
 
 ## Available Attributes
 
+### Basic Configuration
+
 | Attribute | Description | Default |
 |-----------|-------------|---------|
 | `endpoint` | API endpoint URL for form submission | Required |
+| `theme` | Force theme: "light", "dark", or auto | Auto-detect |
 | `heading` | Optional form heading/title | None |
+
+### Styling
+
+| Attribute | Description | Default |
+|-----------|-------------|---------|
 | `primary-color` | Main button/accent color | `#3b82f6` |
 | `background-color` | Form background color | `#ffffff` |
 | `text-color` | Text color | `#374151` |
 | `border-color` | Input border color | `#d1d5db` |
-| `input-background-color` | Input field background color | Same as `background-color` |
 | `border-radius` | Corner roundness | `6px` |
 | `font-family` | Custom font family | System fonts |
 | `font-size` | Base font size | `14px` |
 | `google-font` | Google Font name | None |
-| `success-message` | Custom success message | `Thank you! Your message has been sent.` |
-| `error-message` | Custom error message | `Sorry, there was an error. Please try again.` |
+| `input-background-color` | Input field background color | Same as `background-color` |
+| `button-text-color` | Button text color | `#ffffff` |
+| `success-message` | Custom success message | `Message sent successfully!` |
+| `error-message` | Custom error message | `Failed to send message. Please try again.` |
+
+### Dark Mode Styling
+
+| Attribute | Description | Default |
+|-----------|-------------|---------|
 | `dark-primary-color` | Primary color for dark mode | `#60a5fa` |
 | `dark-background-color` | Background color for dark mode | `#1f2937` |
 | `dark-text-color` | Text color for dark mode | `#f9fafb` |
 | `dark-border-color` | Border color for dark mode | `#4b5563` |
-| `dark-input-background-color` | Input field background color for dark mode | Same as `dark-background-color` |
+| `dark-input-background-color` | Input background for dark mode | Same as `dark-background-color` |
+| `dark-button-text-color` | Button text color for dark mode | `#ffffff` |
 
 ## Form Fields
 
